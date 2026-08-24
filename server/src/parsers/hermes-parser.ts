@@ -68,33 +68,83 @@ function extractCommand(toolCallsJson: string | null): string | undefined {
  * Returns null for messages that don't generate meaningful events.
  */
 export function parseHermesMessage(msg: HermesMessageRow): ParsedEvent | null {
-  // Tool results - these are the main activity signals
+  // Assistant messages with tool_calls - these define WHAT the agent is doing
+  if (msg.role === 'assistant' && msg.tool_calls) {
+    const toolCallsData = tryParseJson(msg.tool_calls);
+    if (!Array.isArray(toolCallsData) || toolCallsData.length === 0) return null;
+
+    // Process each tool call
+    const events: ParsedEvent[] = [];
+    
+    for (const tc of toolCallsData) {
+      if (!tc || typeof tc !== 'object') continue;
+      
+      const func = tc.function;
+      if (!func || typeof func !== 'object') continue;
+      
+      const toolName = func.name;
+      if (typeof toolName !== 'string') continue;
+      
+      // Parse arguments
+      let args: Record<string, unknown> = {};
+      if (typeof func.arguments === 'string') {
+        args = tryParseJson(func.arguments);
+      }
+      
+      // Get the activity for this tool
+      let activity = hermesToolToActivity(toolName);
+      let command: string | undefined;
+      let file: string | undefined;
+      
+      // Special handling for terminal commands
+      if (toolName === 'terminal') {
+        command = typeof args.command === 'string' ? args.command : undefined;
+        
+        // Check if it's a git command
+        if (command && GIT_COMMAND_PATTERN.test(command)) {
+          activity = 'git';
+        }
+      }
+      
+      // Extract file path based on tool type
+      if (toolName === 'read_file' || toolName === 'write_file') {
+        file = typeof args.path === 'string' ? args.path : undefined;
+      } else if (toolName === 'patch') {
+        file = typeof args.path === 'string' ? args.path : undefined;
+      } else if (toolName === 'search_files') {
+        file = typeof args.path === 'string' ? args.path : undefined;
+      }
+      
+      const toolCall: ToolCall = {
+        id: tc.id || `hermes-${msg.id}-${toolName}`,
+        name: toolName,
+        timestamp: Math.floor(msg.timestamp * 1000),
+        input: args,
+      };
+      
+      events.push({
+        sessionId: msg.session_id,
+        slug: undefined,
+        timestamp: Math.floor(msg.timestamp * 1000),
+        activity,
+        toolCalls: [toolCall],
+        file,
+        command,
+        cwd: undefined,
+        kind: 'tool',
+        isTurnEnd: false,
+      });
+    }
+    
+    // Return the first event (or combine if multiple)
+    // For simplicity, return the last tool call as the main activity
+    return events.length > 0 ? events[events.length - 1] : null;
+  }
+  
+  // Tool results - secondary activity signals (we mainly use assistant tool_calls)
   if (msg.role === 'tool' && msg.tool_name) {
-    const activity = hermesToolToActivity(msg.tool_name);
-    
-    const toolCalls: ToolCall[] = [{
-      id: `hermes-${msg.id}`,
-      name: msg.tool_name,
-      timestamp: Math.floor(msg.timestamp * 1000),
-      input: msg.tool_calls ? tryParseJson(msg.tool_calls) : {},
-    }];
-    
-    // Determine if this is a git command
-    const command = msg.tool_name === 'terminal' ? extractCommand(msg.tool_calls) : undefined;
-    const isGit = command !== undefined && GIT_COMMAND_PATTERN.test(command);
-    
-    return {
-      sessionId: msg.session_id,
-      slug: undefined,
-      timestamp: Math.floor(msg.timestamp * 1000),
-      activity: isGit ? 'git' : activity,
-      toolCalls,
-      file: extractFileFromToolCalls(msg.tool_calls, msg.tool_name),
-      command,
-      cwd: undefined,
-      kind: 'tool',
-      isTurnEnd: false,
-    };
+    // Skip tool results - we already captured the activity from assistant message
+    return null;
   }
   
   // User messages - capture the prompt
