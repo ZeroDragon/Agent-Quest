@@ -5,6 +5,7 @@ import type { HermesMessageRow } from './hermes-types';
 import { HERMES_TOOL_ACTIVITY_MAP } from './hermes-types';
 
 const GIT_COMMAND_PATTERN = /\bgit\s+(commit|push|merge|rebase|cherry-pick)\b/;
+const GH_REVIEW_PATTERN = /\bgh\s+(pr|issue)\s+(review|create|list|view|status|ready|merge|close|comment)\b/;
 
 /**
  * Extract activity from a Hermes tool name.
@@ -103,6 +104,10 @@ export function parseHermesMessage(msg: HermesMessageRow): ParsedEvent | null {
         // Check if it's a git command
         if (command && GIT_COMMAND_PATTERN.test(command)) {
           activity = 'git';
+        }
+        // Check if it's a GitHub review command (gh pr review, etc.)
+        else if (command && GH_REVIEW_PATTERN.test(command)) {
+          activity = 'reviewing';
         }
       }
       
