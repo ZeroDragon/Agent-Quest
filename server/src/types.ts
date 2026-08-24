@@ -13,7 +13,7 @@ export const HERO_COLORS = [
 export type HeroColor = (typeof HERO_COLORS)[number];
 
 // --- Agent source (which external agent produced this session) ---
-export const AGENT_SOURCES = ['claude', 'codex'] as const;
+export const AGENT_SOURCES = ['claude', 'codex', 'hermes'] as const;
 export type AgentSource = (typeof AGENT_SOURCES)[number];
 
 // --- Agent activity (maps to village buildings) ---

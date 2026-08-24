@@ -1,0 +1,28 @@
+# Agent Quest - mise configuration
+# Run: mise install
+
+[tools]
+bun = "1.4.0"
+node = "22.23.2"
+
+[tasks.setup]
+description = "Install all dependencies"
+run = "bun install"
+sources = ["package.json", "server/package.json", "client/package.json"]
+outputs = ["node_modules/"]
+
+[tasks.dev]
+description = "Start both server and client in dev mode"
+run = "bun start"
+
+[tasks.dev-server]
+description = "Start server only"
+run = "bun run dev:server"
+
+[tasks.dev-client]
+description = "Start client only"
+run = "bun run dev:client"
+
+[tasks.check-assets]
+description = "Verify sprite assets exist"
+run = "bun run check:assets"

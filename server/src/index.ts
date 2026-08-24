@@ -10,6 +10,7 @@ import { registerMapRoutes } from './map/routes';
 import { registerHookRoutes } from './hooks/routes';
 import { ClaudeProvider } from './providers/claude-provider';
 import { CodexProvider } from './providers/codex-provider';
+import { HermesProvider } from './providers/hermes-provider';
 import type { ProviderHandlers, SessionStartPayload, SessionEventsPayload } from './providers/types';
 import type { ParsedEvent } from './parsers/session-parser';
 
@@ -150,6 +151,7 @@ const providerHandlers: ProviderHandlers = {
 
 const claudeProvider = new ClaudeProvider({ maxAgeMs: SESSION_MAX_AGE_MS });
 const codexProvider = new CodexProvider({ maxAgeMs: SESSION_MAX_AGE_MS });
+const hermesProvider = new HermesProvider({ scanIntervalMs: 3000 });
 
 // Optional Claude Code lifecycle-hook integration (Claude-only — Codex has no
 // hooks). Provides authoritative, low-latency turn-end signals and an opt-in
@@ -162,7 +164,7 @@ registerHookRoutes(app, {
 });
 
 function allConfigDirs(): string[] {
-  return [...claudeProvider.getConfigDirs(), ...codexProvider.getConfigDirs()];
+  return [...claudeProvider.getConfigDirs(), ...codexProvider.getConfigDirs(), ...hermesProvider.getConfigDirs()];
 }
 
 // --- Lifecycle: active → idle (5m) → completed (30m) → removed (2h, keep min 5) ---
@@ -196,18 +198,19 @@ setInterval(() => {
   }
 }, 30_000);
 
-// Start both providers before the HTTP server so the very first client
+// Start all providers before the HTTP server so the very first client
 // connection's snapshot already carries the discovered configDirs (instead
 // of racing the async auto-discovery and incorrectly reporting "no agent
 // CLI install").
 await claudeProvider.start(providerHandlers);
 await codexProvider.start(providerHandlers);
+await hermesProvider.start(providerHandlers);
 
-// If neither provider found anything on disk, emit a single aggregated
+// If no providers found anything on disk, emit a single aggregated
 // warning so the user sees one clear diagnostic line instead of per-provider
 // chatter. The client banner shows the equivalent message to the user.
 if (allConfigDirs().length === 0) {
-  console.warn('[Server] WARNING: no Claude Code or Codex install detected. Start a session with either to see heroes here.');
+  console.warn('[Server] WARNING: no Claude Code, Codex, or Hermes install detected. Start a session with either to see heroes here.');
 }
 
 // Seed the liveness registry with the same config dirs the watcher just
