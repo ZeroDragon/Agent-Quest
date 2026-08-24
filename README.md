@@ -3,20 +3,20 @@
 </p>
 
 <p align="center">
-  <strong>A fantasy village dashboard for monitoring your Claude Code CLI and Codex agents.</strong>
+  <strong>A fantasy village dashboard for monitoring your Claude Code, Codex, and Hermes agents.</strong>
 </p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /></a>
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/bun-%E2%89%A51.1-black.svg" alt="Bun ≥ 1.1" /></a>
-  <a href="https://www.buymeacoffee.com/fulvio"><img src="https://img.shields.io/badge/Buy%20me%20a%20beer-%F0%9F%8D%BA-FFDD00?logo=buymeacoffee&logoColor=black" alt="Buy me a beer" /></a>
+  <a href="https://ko-fi.com/zerodragon"><img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-%E2%98%95-FF5E5B?logo=ko-fi&logoColor=white" alt="Buy me a coffee" /></a>
 </p>
 
 ---
 
-> **Use Claude Code CLI or Codex as usual — each agent session auto-spawns a hero on the dashboard, live.**
+> **Use Claude Code, Codex, or Hermes as usual — each agent session auto-spawns a hero on the dashboard, live.**
 
-Agent Quest is a browser-based monitoring dashboard that visualizes active Claude Code and Codex agent sessions as fantasy heroes in a 2D village. Each running agent becomes a hero who walks between buildings based on what it's doing: `Read` sends it to the Library, `Edit` to the Forge, `Bash` to the Arena, and so on.
+Agent Quest is a browser-based monitoring dashboard that visualizes active Claude Code, Codex, and Hermes agent sessions as fantasy heroes in a 2D village. Each running agent becomes a hero who walks between buildings based on what it's doing: `Read` sends it to the Library, `Edit` to the Forge, `Bash` to the Arena, and so on.
 
 <p align="center">
   <img src="docs/media/day.gif" alt="Agent Quest — main view" width="820" />
@@ -41,12 +41,12 @@ Agent Quest is a browser-based monitoring dashboard that visualizes active Claud
 
 ## Why?
 
-Claude Code and Codex sessions happen in a terminal — useful, but not very *alive*. When you run several agents at once (across projects, across `~/.claude*` installations and `~/.codex`), it's hard to feel what they're actually doing. Agent Quest turns that invisible activity into something you can glance at: a little village where every hero is an agent, and where they walk tells you what they're up to.
+Claude Code, Codex, and Hermes sessions happen in a terminal — useful, but not very *alive*. When you run several agents at once (across projects, across `~/.claude*` installations, `~/.codex`, or `~/.hermes`), it's hard to feel what they're actually doing. Agent Quest turns that invisible activity into something you can glance at: a little village where every hero is an agent, and where they walk tells you what they're up to.
 
 ## Features
 
-- Real-time visualization of active Claude Code and Codex sessions
-- Auto-discovery of every `~/.claude*` directory (supports multiple installations like `~/.claude-work`, `~/.claude-personale`) and of `~/.codex` if present
+- Real-time visualization of active Claude Code, Codex, and Hermes sessions
+- Auto-discovery of every `~/.claude*` directory (supports multiple installations like `~/.claude-work`, `~/.claude-personale`), `~/.codex` if present, and `~/.hermes` for Hermes agents
 - Activity feed, party bar, and detail panel alongside the village scene
 - Built-in map editor for customizing the village layout
 - Sub-2s latency via native WebSocket (optional lower-latency path via Claude Code `postToolUse` hooks — Claude Code only; Codex doesn't expose hooks)
@@ -55,7 +55,7 @@ Claude Code and Codex sessions happen in a terminal — useful, but not very *al
 
 **Required**
 - [Bun](https://bun.sh) 1.1 or later — the runtime behind both the server and the scripts. If you don't have it: `curl -fsSL https://bun.sh/install | bash`
-- An active Claude Code or Codex installation (one or more `~/.claude*` directories, and/or `~/.codex`, with session logs). Without either, the dashboard still starts, but the village stays empty and a banner tells you so.
+- An active Claude Code, Codex, or Hermes installation (one or more `~/.claude*` directories, `~/.codex`, or `~/.hermes` with session logs). Without any of these, the dashboard still starts, but the village stays empty and a banner tells you so.
 - See the [Platform matrix](#platform-matrix) below for OS support per provider.
 
 **Optional**
@@ -144,7 +144,7 @@ lsof -ti:4444,4445 | xargs kill -9
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
 ```
 
-**Empty village with a "No Claude Code or Codex installation detected" banner** — expected when no `~/.claude*` or `~/.codex` directory with session logs exists. Start a Claude Code or Codex session and heroes appear automatically (the banner disappears on its own).
+**Empty village with a "No Claude Code, Codex, or Hermes installation detected" banner** — expected when no `~/.claude*`, `~/.codex`, or `~/.hermes` directory with session logs exists. Start a Claude Code, Codex, or Hermes session and heroes appear automatically (the banner disappears on its own).
 
 **Assets look broken or the app blocks at boot with "missing asset" screens** — see [Missing assets](#missing-assets).
 
@@ -248,10 +248,10 @@ Issues and pull requests are welcome — bug reports, feature ideas, new buildin
 
 ## Support
 
-If Agent Quest makes your agents feel a little more alive, a beer is always welcome 🍺 — every one helps keep the updates flowing.
+If Agent Quest makes your agents feel a little more alive, a coffee is always welcome ☕ — every one helps keep the updates flowing.
 
 <p align="left">
-  <a href="https://www.buymeacoffee.com/fulvio"><img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20beer&emoji=%F0%9F%8D%BA&slug=fulvio&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" alt="Buy me a beer" /></a>
+  <a href="https://ko-fi.com/zerodragon"><img src="https://img.shields.io/badge/Buy%20me%20a%20coffee-%E2%98%95-FF5E5B?logo=ko-fi&logoColor=white" alt="Buy me a coffee" /></a>
 </p>
 
 ## Credits
@@ -260,4 +260,4 @@ If Agent Quest makes your agents feel a little more alive, a beer is always welc
 
 ## License
 
-[MIT](LICENSE) © [Fulvio Scichilone](https://github.com/FulAppiOS)
+[MIT](LICENSE) © [Fulvio Scichilone](https://github.com/FulAppiOS) and [Zero Dragon](https://github.com/zerodragon)

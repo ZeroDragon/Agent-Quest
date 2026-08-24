@@ -33,23 +33,23 @@ export function Tutorial({ onClose }: TutorialProps) {
         <h2 className="tutorial-title">Welcome to Agent Quest</h2>
 
         <div className="tutorial-tagline">
-          Use <strong>Claude Code CLI</strong> or <strong>Codex</strong> as usual — each session auto-spawns a hero on the dashboard, live.
+          Use <strong>Claude Code CLI</strong>, <strong>Codex</strong>, or <strong>Hermes</strong> as usual — each session auto-spawns a hero on the dashboard, live.
         </div>
 
         <a
           className="tutorial-tip-jar"
-          href="https://buymeacoffee.com/fulvio"
+          href="https://ko-fi.com/zerodragon"
           target="_blank"
           rel="noreferrer"
-          title="Support the project — buy me a beer"
+          title="Support the project — buy me a coffee"
         >
-          <span className="tutorial-tip-jar-icon" aria-hidden="true">🍺</span>
-          <span className="tutorial-tip-jar-text">Buy me a beer</span>
+          <span className="tutorial-tip-jar-icon" aria-hidden="true">☕</span>
+          <span className="tutorial-tip-jar-text">Buy me a coffee</span>
         </a>
 
         <p className="tutorial-text">
           Agent Quest is a live dashboard that turns your{' '}
-          <strong>Claude Code</strong> and <strong>Codex</strong> sessions into a 2D
+          <strong>Claude Code</strong>, <strong>Codex</strong>, and <strong>Hermes</strong> sessions into a 2D
           fantasy village. Every running agent becomes a <strong>hero</strong> who
           walks between buildings based on what it's doing.
         </p>
@@ -70,7 +70,15 @@ export function Tutorial({ onClose }: TutorialProps) {
             rel="noreferrer"
           >Codex</a>
           , reading rollout logs from{' '}
-          <code>~/.codex/sessions/</code>. It doesn't work with the Claude desktop
+          <code>~/.codex/sessions/</code>. And with{' '}
+          <a
+            className="tutorial-link"
+            href="https://github.com/NousResearch/hermes-agent"
+            target="_blank"
+            rel="noreferrer"
+          >Hermes</a>
+          , monitoring sessions from{' '}
+          <code>~/.hermes/state.db</code>. It doesn't work with the Claude desktop
           app or claude.ai in the browser, since those don't expose local session files.
         </p>
 
@@ -143,7 +151,10 @@ export function Tutorial({ onClose }: TutorialProps) {
           <strong>Codex:</strong> macOS tested. Windows not yet verified.
         </p>
         <p className="tutorial-text">
-          <strong>Linux:</strong> should work for both, but not routinely tested.
+          <strong>Hermes:</strong> macOS and Linux tested. Windows via WSL2.
+        </p>
+        <p className="tutorial-text">
+          <strong>Linux:</strong> should work for all providers, but not routinely tested.
         </p>
 
         <div className="tutorial-section-label">About</div>
@@ -155,7 +166,14 @@ export function Tutorial({ onClose }: TutorialProps) {
             target="_blank"
             rel="noreferrer"
           >@FulAppiOS</a>
-          {' '}on GitHub). Open source under the MIT license —{' '}
+          ) and <strong>Zero Dragon</strong> (
+          <a
+            className="tutorial-link"
+            href="https://github.com/zerodragon"
+            target="_blank"
+            rel="noreferrer"
+          >@zerodragon</a>
+          ) on GitHub. Open source under the MIT license —{' '}
           <a
             className="tutorial-link"
             href="https://github.com/FulAppiOS/agent-quest"
