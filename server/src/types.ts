@@ -72,6 +72,16 @@ export interface AgentState {
    * suppress per-subagent notifications. Always false for Codex (no subagents).
    */
   isSubagent: boolean;
+  /**
+   * True when the name was randomly generated (fantasy name + model).
+   * Generated names persist until the agent disappears from the map.
+   */
+  nameGenerated?: boolean;
+  /**
+   * Display name parts for generated names: [firstName, modelDisplay].
+   * Used to render the name as two lines: firstName on top, (modelDisplay) below.
+   */
+  nameParts?: [string, string];
 }
 
 // --- Session metadata from ~/.claude/sessions/<pid>.json

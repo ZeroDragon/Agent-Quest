@@ -104,6 +104,16 @@ export interface AgentState {
   /** True for Claude Code subagents (Task tool). Set by the server once it
    * sends the flag; until then `isSubagentAgent()` falls back to the id prefix. */
   isSubagent?: boolean;
+  /**
+   * True when the name was randomly generated (fantasy name + model).
+   * Generated names persist until the agent disappears from the map.
+   */
+  nameGenerated?: boolean;
+  /**
+   * Display name parts for generated names: [firstName, modelDisplay].
+   * Used to render the name as two lines: firstName on top, (modelDisplay) below.
+   */
+  nameParts?: [string, string];
 }
 
 /**

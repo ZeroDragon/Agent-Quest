@@ -84,7 +84,12 @@ export function DetailPanel({ agent, onClose, showSourceBadge }: DetailPanelProp
         </span>
         <div className="detail-topbar-body">
           <div className="detail-name-row">
-            <span className="detail-name" style={{ color: HERO_LABEL_COLOR[agent.heroColor] }}>{agent.name}</span>
+            <span className="detail-name" style={{ color: HERO_LABEL_COLOR[agent.heroColor] }}>
+              {agent.nameParts ? agent.nameParts[0] : agent.name}
+              {agent.nameParts && (
+                <span style={{ fontSize: '0.7em', opacity: 0.8 }}> ({agent.nameParts[1]})</span>
+              )}
+            </span>
             {showSourceBadge && (
               <span
                 className="detail-source-badge"

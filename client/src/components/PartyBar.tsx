@@ -74,7 +74,12 @@ function PartyRow({ agent, mode, isSelected, onClick, showSourceBadge }: PartyRo
             <span
               className="partybar-agent-name"
               style={isSelected ? undefined : { color: HERO_LABEL_COLOR[agent.heroColor] }}
-            >{agent.name}</span>
+            >
+              {agent.nameParts ? agent.nameParts[0] : agent.name}
+              {agent.nameParts && (
+                <span style={{ fontSize: '0.7em', opacity: 0.8 }}> ({agent.nameParts[1]})</span>
+              )}
+            </span>
             <span className={`partybar-dot ${agent.status}`} aria-hidden="true" />
           </span>
           <span className="partybar-row-bottom">

@@ -1,6 +1,7 @@
 import type { AgentSource, AgentState, HeroClass, HeroColor } from '../types';
 import { HERO_CLASSES, HERO_COLORS } from '../types';
 import type { ParsedEvent } from '../parsers/session-parser';
+import { pickRandomName } from '../names/fantasy-names';
 
 const EDIT_TOOLS = new Set(['Edit', 'Write', 'NotebookEdit']);
 
@@ -452,9 +453,21 @@ export class AgentStateManager {
     source: AgentSource,
     nameOverride?: string,
   ): AgentState {
-    const name = nameOverride !== undefined && nameOverride.length > 0
-      ? nameOverride
-      : deriveAgentName(event.slug, event.cwd, event.sessionId);
+    // If nameOverride is provided (formatted model name), generate random hero name
+    // Otherwise, use derived name from slug/cwd/sessionId
+    let name: string;
+    let nameGenerated = false;
+    let nameParts: [string, string] | undefined;
+    if (nameOverride !== undefined && nameOverride.length > 0) {
+      // nameOverride is already the formatted model display name (e.g. "Opus 4")
+      // Generate random first name and store parts separately
+      const firstName = pickRandomName();
+      name = firstName; // Just the first name for the hero sprite
+      nameParts = [firstName, nameOverride];
+      nameGenerated = true;
+    } else {
+      name = deriveAgentName(event.slug, event.cwd, event.sessionId);
+    }
     const agent: AgentState = {
       id: event.sessionId,
       name,
@@ -478,6 +491,8 @@ export class AgentStateManager {
       source,
       model: event.model,
       isSubagent: isSubagentSessionId(event.sessionId),
+      nameGenerated,
+      nameParts,
     };
     return agent;
   }
@@ -523,7 +538,8 @@ export class AgentStateManager {
 
     // Subagents keep their filename-derived name — the event's slug is the
     // parent session's slug (copied verbatim) and would be misleading.
-    if (!isSubagentId(agent.id)) {
+    // Generated names (random fantasy + model) persist until the agent disappears.
+    if (!isSubagentId(agent.id) && !agent.nameGenerated) {
       if (event.slug !== undefined) {
         agent.name = event.slug;
       } else if (looksLikeSessionPrefix(agent.name) && event.cwd !== undefined) {
