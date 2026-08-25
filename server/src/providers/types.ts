@@ -8,6 +8,8 @@ export interface SessionStartPayload {
   events: ParsedEvent[];
   /** Optional name override resolved by the provider (e.g. Claude subagent label). */
   nameOverride?: string;
+  /** Parent session id for subagents (Hermes: parent_session_id from state.db). */
+  parentSessionId?: string;
 }
 
 export interface SessionEventsPayload {

@@ -112,6 +112,7 @@ export class AgentStateManager {
     configDir = '',
     source: AgentSource = 'claude',
     nameOverride?: string,
+    parentSessionId?: string,
   ): ProcessResult | null {
     const existing = this.agents.get(event.sessionId);
 
@@ -126,7 +127,7 @@ export class AgentStateManager {
     }
 
     if (existing === undefined) {
-      const agent = this.createAgent(event, configDir, source, nameOverride);
+      const agent = this.createAgent(event, configDir, source, nameOverride, parentSessionId);
       this.agents.set(event.sessionId, agent);
       this.addUsage(agent, event);
       this.applyDerivedStatus(agent);
@@ -452,6 +453,7 @@ export class AgentStateManager {
     configDir: string,
     source: AgentSource,
     nameOverride?: string,
+    parentSessionId?: string,
   ): AgentState {
     // If nameOverride is provided (formatted model name), generate random hero name
     // Otherwise, use derived name from slug/cwd/sessionId
@@ -490,7 +492,8 @@ export class AgentStateManager {
       configDir,
       source,
       model: event.model,
-      isSubagent: isSubagentSessionId(event.sessionId),
+      // Mark as subagent if: session id has agent- prefix (Claude) OR parentSessionId is present (Hermes)
+      isSubagent: isSubagentSessionId(event.sessionId) || (parentSessionId !== undefined && parentSessionId !== null),
       nameGenerated,
       nameParts,
     };

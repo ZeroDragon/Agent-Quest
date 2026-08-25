@@ -104,6 +104,11 @@ export interface ParsedEvent {
    * counting a message's tokens 2-3×.
    */
   usageMessageId?: string;
+  /**
+   * Parent session id for subagents (Hermes uses parent_session_id from state.db).
+   * When present, the agent is marked as a subagent regardless of session id prefix.
+   */
+  parentSessionId?: string;
 }
 
 interface LastPromptLine {

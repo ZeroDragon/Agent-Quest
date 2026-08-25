@@ -56,10 +56,12 @@ export class HermesProvider implements SessionProvider {
 
     this.watcher = new SqliteWatcher(
       {
-        onSessionStart: (sessionId, source, cwd, model) => {
-          console.log(`[HermesProvider] new session: ${sessionId} (${source}, ${cwd ?? 'unknown'}, model: ${model ?? 'unknown'})`);
+        onSessionStart: (sessionId, source, cwd, model, parentSessionId) => {
+          console.log(`[HermesProvider] new session: ${sessionId} (${source}, ${cwd ?? 'unknown'}, model: ${model ?? 'unknown'}, parent: ${parentSessionId ?? 'none'})`);
           if (model) sessionModels.set(sessionId, model);
           // We'll load initial events on first update
+          // Store parentSessionId for use in onSessionUpdate
+          if (parentSessionId) this.parentSessionIds.set(sessionId, parentSessionId);
         },
         onSessionUpdate: (sessionId, newMessages) => {
           const events = parseHermesMessages(newMessages);
@@ -74,12 +76,14 @@ export class HermesProvider implements SessionProvider {
             const nameOverride = model ? this.formatModelName(model) : undefined;
             
             // For new sessions, we need to emit a session start with events
+            const parentSessionId = this.parentSessionIds.get(sessionId);
             handlers.onSessionStart({
               source: this.source,
               sessionId,
               configDir: this.hermesRoot,
               events,
               nameOverride,
+              parentSessionId,
             });
           } else {
             handlers.onSessionEvents({
@@ -179,4 +183,5 @@ export class HermesProvider implements SessionProvider {
   }
 
   private knownSessions = new Set<string>();
+  private parentSessionIds = new Map<string, string>();
 }

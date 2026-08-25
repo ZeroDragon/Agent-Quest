@@ -660,11 +660,17 @@ export class VillageScene extends Phaser.Scene {
     const showSourceBadge = hasClaude && hasCodex;
 
     // Remove heroes no longer visible
+    // All heroes walk to the spawn point before destroying (despawn animation)
     for (const [id, hero] of this.heroes) {
       if (!visible.some((a) => a.id === id)) {
         const oldBuilding = this.removeFromSlot(id);
-        hero.destroy();
-        this.heroes.delete(id);
+        
+        // Walk hero to spawn point, then destroy
+        hero.despawn(this.heroSpawn.x, this.heroSpawn.y, () => {
+          hero.destroy();
+          this.heroes.delete(id);
+        });
+        
         if (oldBuilding !== undefined) {
           this.repositionBuilding(oldBuilding);
         }

@@ -242,6 +242,7 @@ export class HeroSprite {
 
   get x(): number { return this._x; }
   get y(): number { return this._y; }
+  get isSubagentFlag(): boolean { return this.isSubagent; }
 
   /** Override the default hero scale (e.g. from MapConfig settings). */
   setHeroScale(scale: number): void {
@@ -631,6 +632,96 @@ export class HeroSprite {
         this.moveTween = null;
         this.updateDepth();
         this.moveAlongPath(remaining);
+      },
+    });
+  }
+
+  /**
+   * Walk the hero to the given target, then call `onComplete`.
+   * Used for the despawn animation: walk to spawn point → disappear.
+   */
+  despawn(targetX: number, targetY: number, onComplete: () => void): void {
+    // Cancel any existing move
+    if (this.moveTween !== null) {
+      this.moveTween.stop();
+      this.moveTween = null;
+    }
+
+    const path = findRoadPath({ x: this._x, y: this._y }, { x: targetX, y: targetY });
+
+    // Remove the first point (current position)
+    if (path.length > 1) {
+      path.shift();
+    }
+
+    if (path.length === 0) {
+      // Already at target, call onComplete immediately
+      this.sprite.play(`${this.idleKey}-anim`, true);
+      onComplete();
+      return;
+    }
+
+    // Walk along path, then call onComplete at the end
+    this.despawnAlongPath(path, onComplete);
+  }
+
+  private despawnAlongPath(path: Point[], onComplete: () => void): void {
+    if (path.length === 0) {
+      this.sprite.play(`${this.idleKey}-anim`, true);
+      onComplete();
+      return;
+    }
+
+    const next = path[0]!;
+    const remaining = path.slice(1);
+
+    const dx = next.x - this._x;
+    const dy = next.y - this._y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < 5) {
+      this._x = next.x;
+      this._y = next.y;
+      this.updateDepth();
+      this.despawnAlongPath(remaining, onComplete);
+      return;
+    }
+
+    // Flip based on horizontal direction (invert for sprites that natively face left)
+    if (Math.abs(dx) > 5) {
+      this.sprite.setFlipX((dx < 0) !== this.facesLeft);
+    }
+
+    this.sprite.play(`${this.runKey}-anim`, true);
+
+    const duration = (distance / MOVE_SPEED) * 1000;
+
+    this.moveTween = this.scene.tweens.add({
+      targets: { x: this._x, y: this._y },
+      x: next.x,
+      y: next.y,
+      duration,
+      ease: 'Linear',
+      onUpdate: (_tween, target: { x: number; y: number }) => {
+        this._x = target.x;
+        this._y = target.y;
+        this.sprite.setPosition(this._x, this._y);
+        this.nameText.setPosition(this._x, this._y + this.nameOffsetY);
+        this.layoutSubagentAndSource();
+        this.layoutActivityAndModel();
+        this.detailText.setPosition(this._x, this._y + this.detailOffsetY);
+        this.taskText.setPosition(this._x, this._y + this.taskOffsetY);
+        if (this.selectionHalo !== null) {
+          this.selectionHalo.setPosition(this._x, this._y);
+        }
+        this.updateDepth();
+      },
+      onComplete: () => {
+        this._x = next.x;
+        this._y = next.y;
+        this.moveTween = null;
+        this.updateDepth();
+        this.despawnAlongPath(remaining, onComplete);
       },
     });
   }

@@ -5,7 +5,7 @@ import { homedir } from 'node:os';
 import type { HermesSessionRow, HermesMessageRow } from '../parsers/hermes-types';
 
 export interface SqliteWatcherCallbacks {
-  onSessionStart: (sessionId: string, source: string, cwd: string | null, model: string | null) => void;
+  onSessionStart: (sessionId: string, source: string, cwd: string | null, model: string | null, parentSessionId: string | null) => void;
   onSessionUpdate: (sessionId: string, newMessages: HermesMessageRow[]) => void;
 }
 
@@ -77,7 +77,7 @@ export class SqliteWatcher {
       const cutoff = Date.now() / 1000 - this.activeWindowSec;
       
       const activeSessions = this.db.query(`
-        SELECT id, source, cwd, model, last_activity_at 
+        SELECT id, source, cwd, model, last_activity_at, parent_session_id 
         FROM sessions 
         WHERE ended_at IS NULL 
         AND last_activity_at > ?
@@ -116,7 +116,8 @@ export class SqliteWatcher {
         session.id,
         session.source,
         session.cwd,
-        session.model
+        session.model,
+        session.parent_session_id
       );
     }
 
